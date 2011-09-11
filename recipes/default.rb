@@ -16,3 +16,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+package "bind9" do
+  case node[:platform]
+  when "centos", "redhat", "suse", "fedora"
+    package_name "bind"
+  when "debian", "ubuntu"
+    package_name "bind9"
+  end
+  action :install
+end
+
+service "bind9" do
+  supports :status => true, :reload => true, :restart => true
+  action [ :enable, :start ]
+end
+
+template "/etc/bind/named.conf" do
+  source "named.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+end
+
+template "/etc/bind/named.conf.options" do
+  source "named.conf.options.erb"
+  owner "root"
+  group "root"
+  mode 0644
+end
