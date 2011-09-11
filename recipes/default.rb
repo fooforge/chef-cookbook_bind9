@@ -32,8 +32,8 @@ service "bind9" do
   action [ :enable, :start ]
 end
 
-template "/etc/bind/named.conf" do
-  source "named.conf.erb"
+template "/etc/bind/named.conf.local" do
+  source "named.conf.local.erb"
   owner "root"
   group "root"
   mode 0644
@@ -45,3 +45,5 @@ template "/etc/bind/named.conf.options" do
   group "root"
   mode 0644
 end
+
+
