@@ -1,39 +1,48 @@
 options {
-        directory "/var/cache/bind";
+    directory "/var/cache/bind";
 
-        // If there is a firewall between you and nameservers you want
-        // to talk to, you may need to fix the firewall to allow multiple
-        // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+    // If there is a firewall between you and nameservers you want
+    // to talk to, you may need to fix the firewall to allow multiple
+    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
 
-        // If your ISP provided one or more IP addresses for stable
-        // nameservers, you probably want to use them as forwarders.
-        // Uncomment the following block, and insert the addresses replacing
-        // the all-0's placeholder.
+    <% if node[:bind9][:allow_query] %>
+      allow-query {
+        "<%= node[:bind9][:allow_query] %>";
+      };
 
-      <% if node[:bind9][:allow_query] %>
-        allow-query {
-          "<%= node[:bind9][:allow_query] %>";
-        };
+    <% end %>
+      allow-recursion {
+        "<%= node[:bind9][:allow_recursion] %>";
+      };
 
-      <% end %>
-        allow-recursion {
-          "<%= node[:bind9][:allow_recursion] %>";
-        };
+      allow-transfer {
+        "<%= node[:bind9][:allow_transfer] %>";
+      };
 
-        allow-transfer {
-          "<%= node[:bind9][:allow_transfer] %>";
-        };
+    <% if node[:bind9][:allow_update] %>
+      allow-update {
+        "<%= node[:bind9][:allow_update] %>";
+      };
 
-      <% if node[:bind9][:allow_update] %>
-        allow-update {
-          "<%= node[:bind9][:allow_update] %>";
-        };
+    <% end %>
+    <% if node[:bind9][:enable_forwarding]
+      forwarders {
+    <% node[:bind9][:forwarders].each do |forwarder| -%>
+        <%= forwarder %>;
+    <% end %>
+      };
 
-      <% end %>
-        // forwarders {
-        //      0.0.0.0;
-        // };
+    <% end %>
+      auth-nxdomain no;    # conform to RFC1035
+    <% if node[:bind9][:enable_ipv6] %>
+      listen-on-v6 { any; };
+    <% end %>
 
-        auth-nxdomain no;    # conform to RFC1035
-        listen-on-v6 { any; };
-};
+    logging {
+      channel default_log {
+        file "/var/log/bind/bind.log" versions 5 size 128M;
+        print-time yes;
+        print-severity yes;
+        print-category yes;
+      };
+    };

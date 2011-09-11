@@ -45,5 +45,3 @@ template "/etc/bind/named.conf.options" do
   group "root"
   mode 0644
 end
-
-
