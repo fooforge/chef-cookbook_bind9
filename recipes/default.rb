@@ -32,16 +32,30 @@ service "bind9" do
   action [ :enable, :start ]
 end
 
-template "/etc/bind/named.conf.local" do
-  source "named.conf.local.erb"
-  owner "root"
-  group "root"
-  mode 0644
-end
+#template "/etc/bind/named.conf.local" do
+#  source "named.conf.local.erb"
+#  owner "root"
+#  group "root"
+#  mode 0644
+#end
 
 template "/etc/bind/named.conf.options" do
   source "named.conf.options.erb"
   owner "root"
   group "root"
   mode 0644
+end
+
+search(:zones) do |zone|
+  template "/etc/bind/named.conf.local" do
+    source "named.conf.local.erb"
+    owner "root"
+    group "root"
+    mode 0644
+    variables({
+      "domain" => zone[:domain],
+      "type" => zone[:type],
+      "allow_transfer" => zone[:allow_transfer]
+  })
+  end
 end
