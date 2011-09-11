@@ -25,7 +25,7 @@ options {
       };
 
     <% end %>
-    <% if node[:bind9][:enable_forwarding]
+    <% if node[:bind9][:enable_forwarding] %>
       forwarders {
     <% node[:bind9][:forwarders].each do |forwarder| -%>
         <%= forwarder %>;
