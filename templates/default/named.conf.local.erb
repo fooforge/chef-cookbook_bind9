@@ -8,7 +8,7 @@
 
 zone "<%= @domain %>" IN {
   type <%= @type %>;
-  file "<%= @domain %>;
+  file "<%= @domain %>";
   allow-transfer {
   <% @allow_transfer.each do |trans| -%>
     <%= trans %>;
