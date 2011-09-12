@@ -19,8 +19,8 @@
 
 package "bind9" do
   case node[:platform]
-  when "centos", "redhat", "suse", "fedora"
-    package_name "bind"
+#  when "centos", "redhat", "suse", "fedora"
+#    package_name "bind"
   when "debian", "ubuntu"
     package_name "bind9"
   end
