@@ -1,9 +1,12 @@
 Description
 ===========
 
-Installation and configuration of BIND9.
+This cookbook takes care of the installation and configuration of BIND9. At the moment you're able to define some global variables and to manage your zonefiles via data bags (json example below). Besides that there's not much to see, e.g. no DNSSEC, no configurable logging, no rndc shell operations and no automatic serial incrementation or other safety checks (named-checkconf, etc.).
 
-Please keep in mind: This cookbook is far from finished and could break your setup. Use at your own risk!
+It's my intention to round its edges over time. If you want to help feel free to contribute!
+
+DISCLAIMER:
+Please keep in mind: This cookbook is far from finished and not adequately tested. It could break your setup. Use at YOUR OWN RISK!
 
 Requirements
 ============
@@ -27,7 +30,9 @@ Attributes
 Usage
 =====
 
-Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for serving domains you may add the appropriate data via data bags (example below)
+Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for serving domains you may add the appropriate data via data bags (example below).
+Please note that the data bag's structure is mandatory except:
+* TTL for DNS records (if you decide to leave it empty, the global TTL will take over)
 
 {
   "id": "exampleDOTcom",
@@ -36,13 +41,14 @@ Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for s
   "allow_transfer": [ "4.4.4.4",
                       "8.8.8.8" ],
   "zone_info": {
-    "soa": "ns.example.com.com.",
-    "contact": "mike.example.com.",
-    "serial": 2011091401,
+    "global_ttl": 300,
+    "soa": "ns.example.com.",
+    "contact": "user.example.com.",
+    "serial": 2011091402,
     "nameserver": [ "ns.example.com",
-                    "ns.inwx.de",
-                    "ns2.inwx.de.",
-                    "ns3.inwx.de." ],
+                    "ns.example.net",
+                    "ns2.example.org.",
+                    "ns3.example.de." ],
     "mail_exchange": [{
       "host": "ASPMX.L.GOOGLE.COM.",
       "priority": 10
@@ -68,11 +74,12 @@ Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for s
     "records": [{
       "name": "www",
       "type": "A",
-      "ip": "176.9.28.55"
+      "ip": "127.0.0.1"
     },{
       "name": "img",
+      "ttl": 30,
       "type": "A",
-      "ip": "176.9.28.55"
+      "ip": "127.0.0.1"
     },{
       "name": "mail",
       "type": "CNAME",

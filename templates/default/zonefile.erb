@@ -1,4 +1,4 @@
-$TTL 300
+$TTL <%= @global_ttl %>
 @ IN SOA <%= @soa %> <%= @contact %> (
                 <%= @serial %> ; serial [yyyyMMddNN]
                 4H      ; refresh
@@ -17,5 +17,5 @@ $TTL 300
 <% end %>
 
 <% @records.each do |record| -%>
-<%=record['name'] %>   IN   <%= record['type'] %>   <%= record['ip'] %>
+<%=record['name'] %>   <%= if record['ttl'] then record['ttl'] end %> IN   <%= record['type'] %>   <%= record['ip'] %>
 <% end %>
