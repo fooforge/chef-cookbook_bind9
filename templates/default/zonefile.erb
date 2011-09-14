@@ -1,0 +1,21 @@
+$TTL 300
+@ IN SOA <%= @soa %> <%= @contact %> (
+                <%= @serial %> ; serial [yyyyMMddNN]
+                4H      ; refresh
+                30M     ; retry
+                1W      ; expiry
+                1D      ; minimum
+);
+
+                IN              NS              <%= @soa %>
+<% @nameserver.each do |ns| -%>
+                IN              NS              <%= ns %>
+<% end %>
+
+<% @mail_exchange.each do |mx| -%>
+                IN              MX <%= mx['priority'] %>           <%= mx['host'] %>
+<% end %>
+
+<% @records.each do |record| -%>
+<%=record['name'] %> IN              A              <%= record['ip'] %>
+<% end %>

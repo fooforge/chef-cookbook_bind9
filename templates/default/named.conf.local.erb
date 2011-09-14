@@ -6,12 +6,15 @@
 // organization
 //include "/etc/bind/zones.rfc1918";
 
-zone "<%= @domain %>" IN {
-  type <%= @type %>;
-  file "<%= @domain %>";
+<% @zonefiles.each do |conf| -%>
+zone "<%= conf["domain"] %>" IN {
+  type <%= conf["type"] %>;
+  file "<%= conf["domain"] %>";
   allow-transfer {
-  <% @allow_transfer.each do |trans| -%>
-    <%= trans %>;
+  <% conf["allow_transfer"].each do |ip| -%>
+    <%= ip %>;
   <% end %>
   };
 };
+
+<% end %>

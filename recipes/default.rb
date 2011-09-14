@@ -19,8 +19,8 @@
 
 package "bind9" do
   case node[:platform]
-#  when "centos", "redhat", "suse", "fedora"
-#    package_name "bind"
+  when "centos", "redhat", "suse", "fedora"
+    package_name "bind"
   when "debian", "ubuntu"
     package_name "bind9"
   end
@@ -32,13 +32,6 @@ service "bind9" do
   action [ :enable, :start ]
 end
 
-#template "/etc/bind/named.conf.local" do
-#  source "named.conf.local.erb"
-#  owner "root"
-#  group "root"
-#  mode 0644
-#end
-
 template "/etc/bind/named.conf.options" do
   source "named.conf.options.erb"
   owner "root"
@@ -46,16 +39,30 @@ template "/etc/bind/named.conf.options" do
   mode 0644
 end
 
-search(:zones) do |zone|
-  template "/etc/bind/named.conf.local" do
-    source "named.conf.local.erb"
+template "/etc/bind/named.conf.local" do
+  source "named.conf.local.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  variables({
+    :zonefiles => search(:zones)
+})
+end
+
+search(:zones).each do |zone|
+  template "/etc/bind/#{zone['domain']}" do
+    source "zonefile.erb"
     owner "root"
     group "root"
     mode 0644
     variables({
-      "domain" => zone[:domain],
-      "type" => zone[:type],
-      "allow_transfer" => zone[:allow_transfer]
-  })
+      :domain => zone['domain'],
+      :contact => zone['zone_info']['contact'],
+      :soa => zone['zone_info']['soa'],
+      :serial => zone['zone_info']['serial'],
+      :nameserver => zone['zone_info']['nameserver'],
+      :mail_exchange => zone['zone_info']['mail_exchange'],
+      :records => zone['zone_info']['records']
+    })
   end
 end

@@ -3,6 +3,8 @@ Description
 
 Installation and configuration of BIND9.
 
+Please keep in mind: This cookbook is far from finished and could break your setup. Use at your own risk!
+
 Requirements
 ============
 
@@ -10,10 +12,6 @@ Platform:
 
 * Debian
 * Ubuntu
-* CentOS
-* RedHat
-* Suse
-* Fedora
 
 Attributes
 ==========
@@ -29,4 +27,28 @@ Attributes
 Usage
 =====
 
-Add "recipe[bind9]" directly to a node or a role.
+Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for serving domains you may add the appropriate data via data bags (example below)
+
+    {
+      "id": "fooforgeDOTcom",
+      "domain": "fooforge.com",
+      "type": "master",
+      "allow_transfer": [ "4.4.4.4",
+                          "8.8.8.8" ],
+      "zone_info": {
+        "soa": "ns.fooforge.com.",
+        "contact": "mike.fooforge.com.",
+        "serial": 2011091401,
+        "nameserver": [ "ns2.fooforge.com.",
+                        "ns3.fooforge.com." ],
+        "mail_exchange": [{
+            "host": "mx01.fooforge.com.",
+            "priority": 90
+          },{
+            "host": "mx02.fooforge.com.",
+            "priority": 80
+        }]
+      }
+    }
+
+
