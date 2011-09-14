@@ -5,8 +5,8 @@ This cookbook takes care of the installation and configuration of BIND9. At the 
 
 It's my intention to round its edges over time. If you want to help feel free to contribute!
 
-DISCLAIMER:
-Please keep in mind: This cookbook is far from finished and not adequately tested. It could break your setup. Use at **YOUR OWN RISK**!
+**DISCLAIMER**:  
+Please keep in mind that this cookbook is far from finished and not adequately tested. It could break your setup. Use at **YOUR OWN RISK**!
 
 Requirements
 ============
@@ -33,6 +33,11 @@ Usage
 Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for serving domains you may add the appropriate data via data bags (example below).
 Please note that the data bag's structure is mandatory except:
 * TTL for DNS records (if you decide to leave it empty, the global TTL will take over)
+
+    $ knife data bag create zones
+    $ knife data bag create zones exampleDOTcom
+    $ ... do something ...
+    $ knife data bag from file zones exampleDOTcom.json
 
     {
       "id": "exampleDOTcom",
