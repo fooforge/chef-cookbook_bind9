@@ -6,7 +6,7 @@ This cookbook takes care of the installation and configuration of BIND9. At the 
 It's my intention to round its edges over time. If you want to help feel free to contribute!
 
 DISCLAIMER:
-Please keep in mind: This cookbook is far from finished and not adequately tested. It could break your setup. Use at YOUR OWN RISK!
+Please keep in mind: This cookbook is far from finished and not adequately tested. It could break your setup. Use at **YOUR OWN RISK**!
 
 Requirements
 ============
