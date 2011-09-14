@@ -17,5 +17,5 @@ $TTL 300
 <% end %>
 
 <% @records.each do |record| -%>
-<%=record['name'] %> IN              A              <%= record['ip'] %>
+<%=record['name'] %>   IN   <%= record['type'] %>   <%= record['ip'] %>
 <% end %>
