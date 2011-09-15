@@ -31,14 +31,14 @@ Usage
 =====
 
 Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for serving domains you may add the appropriate data via data bags (example below).
-Please note that the data bag's structure is mandatory except:
-
-* TTL for DNS records (if you decide to leave it empty, the global TTL will take over)
-
+Please note that the data bag's structure is mandatory except TTL for DNS records (if you decide to leave it empty, the global TTL will take over).
+  
     $ knife data bag create zones
     $ knife data bag create zones exampleDOTcom
     $ ... do something ...
     $ knife data bag from file zones exampleDOTcom.json
+
+
 
     {
       "id": "exampleDOTcom",
