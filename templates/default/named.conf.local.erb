@@ -9,7 +9,7 @@
 <% @zonefiles.each do |conf| -%>
 zone "<%= conf["domain"] %>" IN {
   type <%= conf["type"] %>;
-  file "<%= conf["domain"] %>";
+  file "/etc/bind/<%= conf["domain"] %>";
   allow-transfer {
   <% conf["allow_transfer"].each do |ip| -%>
     <%= ip %>;
