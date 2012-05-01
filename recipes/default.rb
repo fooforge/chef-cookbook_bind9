@@ -18,52 +18,101 @@
 #
 
 package "bind9" do
-  case node[:platform]
-  when "centos", "redhat", "suse", "fedora"
-    package_name "bind"
-  when "debian", "ubuntu"
-    package_name "bind9"
-  end
-  action :install
+	case node[:platform]
+	when "centos", "redhat", "suse", "fedora"
+		package_name "bind"
+	end
+	action :install
+end
+
+case node[:platform]
+when "centos", "redhat"
+	directory "/var/log/bind/" do
+		owner "named"
+		group "named"
+	end
 end
 
 service "bind9" do
-  supports :status => true, :reload => true, :restart => true
-  action [ :enable, :start ]
+	case node[:platform]
+	when "centos", "redhat"
+		service_name "named"
+	end
+	supports :status => true, :reload => true, :restart => true
+	action [ :enable ]
 end
 
-template "/etc/bind/named.conf.options" do
-  source "named.conf.options.erb"
-  owner "root"
-  group "root"
-  mode 0644
+template node[:bind9][:config_file] do
+	source "named.conf.erb"
+	owner "root"
+	group "root"
+	mode 0644
+  notifies :restart, resources(:service => "bind9")
 end
 
-template "/etc/bind/named.conf.local" do
-  source "named.conf.local.erb"
-  owner "root"
-  group "root"
-  mode 0644
-  variables({
-    :zonefiles => search(:zones)
-})
+template node[:bind9][:options_file] do
+	source "named.conf.options.erb"
+	owner "root"
+	group "root"
+	mode 0644
+  notifies :restart, resources(:service => "bind9")
 end
+
+template node[:bind9][:local_file] do
+	source "named.conf.local.erb"
+	owner "root"
+	group "root"
+	mode 0644
+	variables({
+		:zonefiles => search(:zones)
+	})
+  notifies :restart, resources(:service => "bind9")
+end
+
 
 search(:zones).each do |zone|
-  template "/etc/bind/#{zone['domain']}" do
-    source "zonefile.erb"
-    owner "root"
-    group "root"
-    mode 0644
-    variables({
-      :domain => zone['domain'],
-      :soa => zone['zone_info']['soa'],
-      :contact => zone['zone_info']['contact'],
-      :serial => zone['zone_info']['serial'],
-      :global_ttl => zone['zone_info']['global_ttl'],
-      :nameserver => zone['zone_info']['nameserver'],
-      :mail_exchange => zone['zone_info']['mail_exchange'],
-      :records => zone['zone_info']['records']
-    })
-  end
+	unless zone['autodomain'].nil? || zone['autodomain'] == ''
+		search(:node, "domain:#{zone['autodomain']}").each do |host|
+			next if host['ipaddress'] == '' || host['ipaddress'].nil?
+			zone['zone_info']['records'].push( {
+				"name" => host['hostname'],
+				"type" => "A",
+				"ip" => host['ipaddress']
+			})
+		end
+	end
+
+	template "#{node[:bind9][:config_path]}/#{zone['domain']}" do
+		source "#{node[:bind9][:config_path]}/#{zone['domain']}.erb"
+		local true
+		owner "root"
+		group "root"
+		mode 0644
+		notifies :restart, resources(:service => "bind9")
+		variables({
+			:serial => Time.new.strftime("%Y%m%d%H%M%S")
+		})
+		action :nothing
+	end
+
+	template "#{node[:bind9][:config_path]}/#{zone['domain']}.erb" do
+		source "zonefile.erb"
+		owner "root"
+		group "root"
+		mode 0644
+		variables({
+			:domain => zone['domain'],
+			:soa => zone['zone_info']['soa'],
+			:contact => zone['zone_info']['contact'],
+			:global_ttl => zone['zone_info']['global_ttl'],
+			:nameserver => zone['zone_info']['nameserver'],
+			:mail_exchange => zone['zone_info']['mail_exchange'],
+			:records => zone['zone_info']['records']
+		})
+		notifies :create, resources(:template => "#{node[:bind9][:config_path]}/#{zone['domain']}"), :immediately
+	end
+end
+
+service "bind9" do
+	action [ :start ]
 end
