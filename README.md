@@ -1,7 +1,9 @@
 Description
 ===========
 
-This cookbook takes care of the installation and configuration of BIND9. At the moment you're able to define some global variables and to manage your zonefiles via data bags (json example below). Besides that there's not much to see, e.g. no DNSSEC, no configurable logging, no rndc shell operations and no automatic serial incrementation or other safety checks (named-checkconf, etc.).
+This cookbook takes care of the installation and configuration of BIND9. At the moment you're able to define some global variables and to manage your zonefiles via data bags (json example below).
+It currently also supports automatic serial number generation and automatic resource records for chef nodes (see optional json in example below)
+Besides that there's not much to see, e.g. no DNSSEC, no configurable logging, no rndc shell operations or other safety checks (named-checkconf, etc.).
 
 It's my intention to round its edges over time. If you want to help feel free to contribute!
 
@@ -15,6 +17,7 @@ Platform:
 
 * Debian
 * Ubuntu
+* Centos
 
 Attributes
 ==========
@@ -31,7 +34,9 @@ Usage
 =====
 
 Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for serving domains you may add the appropriate data via data bags (example below).
-Please note that the data bag's structure is mandatory except TTL for DNS records (if you decide to leave it empty, the global TTL will take over).
+Please note that the data bag's structure is mandatory except:
+-TTL for DNS records (if you decide to leave it empty, the global TTL will take over).
+-autodomain for the zone (if you include this, automatic records will be added for chef nodes whose "domain" matches this)
   
     $ knife data bag create zones
     $ knife data bag create zones exampleDOTcom
@@ -50,7 +55,7 @@ Please note that the data bag's structure is mandatory except TTL for DNS record
         "global_ttl": 300,
         "soa": "ns.example.com.",
         "contact": "user.example.com.",
-        "serial": 2011091402,
+				"autodomain": "example.com.",
         "nameserver": [ "ns.example.com",
                         "ns.example.net",
                         "ns2.example.org.",
