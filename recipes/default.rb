@@ -42,14 +42,6 @@ service "bind9" do
 	action [ :enable ]
 end
 
-template node[:bind9][:config_file] do
-	source "named.conf.erb"
-	owner "root"
-	group "root"
-	mode 0644
-  notifies :restart, resources(:service => "bind9")
-end
-
 template node[:bind9][:options_file] do
 	source "named.conf.options.erb"
 	owner "root"

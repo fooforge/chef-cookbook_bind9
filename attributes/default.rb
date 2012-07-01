@@ -20,7 +20,6 @@ when "centos","redhat","fedora","scientific","amazon"
 	default[:bind9][:data_path] = "/var/named"
 else
   default[:bind9][:config_path] = "/etc/bind"
-	default[:bind9][:config_file] = "/etc/bind/named.conf"
 	default[:bind9][:options_file] = "/etc/bind/named.conf.options"
 	default[:bind9][:local_file] = "/etc/bind/named.conf.local"
 	default[:bind9][:data_path] = "/var/cache/bind"
