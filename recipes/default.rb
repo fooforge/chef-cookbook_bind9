@@ -26,8 +26,8 @@ package "bind9" do
 end
 
 directory "/var/log/bind/" do
-  owner "named"
-  group "named"
+  owner node[:bind9][:user]
+  group node[:bind9][:user]
   mode 0755
 end
 
