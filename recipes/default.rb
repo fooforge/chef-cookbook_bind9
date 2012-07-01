@@ -25,12 +25,10 @@ package "bind9" do
 	action :install
 end
 
-case node[:platform]
-when "centos", "redhat"
-	directory "/var/log/bind/" do
-		owner "named"
-		group "named"
-	end
+directory "/var/log/bind/" do
+  owner "named"
+  group "named"
+  mode 0755
 end
 
 service "bind9" do
