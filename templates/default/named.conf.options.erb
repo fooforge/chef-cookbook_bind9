@@ -1,42 +1,42 @@
 options {
-    directory "<%= node[:bind9][:data_path] %>";
+  directory "<%= node[:bind9][:data_path] %>";
 
-    // If there is a firewall between you and nameservers you want
-    // to talk to, you may need to fix the firewall to allow multiple
-    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+  // If there is a firewall between you and nameservers you want
+  // to talk to, you may need to fix the firewall to allow multiple
+  // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
 
-    <% if node[:bind9][:allow_query] %>
-      allow-query {
-        "<%= node[:bind9][:allow_query] %>";
-      };
+  <% if node[:bind9][:allow_query] %>
+    allow-query {
+      "<%= node[:bind9][:allow_query] %>";
+    };
 
-    <% end %>
-      allow-recursion {
-        <%= node[:bind9][:allow_recursion] %>;
-      };
+  <% end %>
+    allow-recursion {
+      <%= node[:bind9][:allow_recursion] %>;
+    };
 
-      allow-transfer {
-        "<%= node[:bind9][:allow_transfer] %>";
-      };
+    allow-transfer {
+      "<%= node[:bind9][:allow_transfer] %>";
+    };
 
-    <% if node[:bind9][:allow_update] %>
-      allow-update {
-        "<%= node[:bind9][:allow_update] %>";
-      };
+  <% if node[:bind9][:allow_update] %>
+    allow-update {
+      "<%= node[:bind9][:allow_update] %>";
+    };
 
-    <% end %>
-    <% if node[:bind9][:enable_forwarding] %>
-      forwarders {
-    <% node[:bind9][:forwarders].each do |forwarder| -%>
-        <%= forwarder %>;
-    <% end %>
-      };
+  <% end %>
+  <% if node[:bind9][:enable_forwarding] %>
+    forwarders {
+  <% node[:bind9][:forwarders].each do |forwarder| -%>
+      <%= forwarder %>;
+  <% end %>
+    };
 
-    <% end %>
-      auth-nxdomain no;    # conform to RFC1035
-    <% if node[:bind9][:enable_ipv6] %>
-      listen-on-v6 { any; };
-    <% end %>
+  <% end %>
+    auth-nxdomain no;    # conform to RFC1035
+  <% if node[:bind9][:enable_ipv6] %>
+    listen-on-v6 { any; };
+  <% end %>
 };
 
 logging {
