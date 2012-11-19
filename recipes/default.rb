@@ -19,25 +19,39 @@
 
 package "bind9" do
   case node[:platform]
-  when "centos", "redhat", "suse", "fedora"
+  when "centos", "redhat", "suse", "fedora", "smartos"
     package_name "bind"
   end
   action :install
 end
 
-directory "/var/log/bind/" do
+directory node[:bind9][:log_path] do
   owner node[:bind9][:user]
   group node[:bind9][:user]
-  mode 0755
+  mode 0775
+  recursive true
+  action :create
 end
 
 service "bind9" do
   case node[:platform]
   when "centos", "redhat"
     service_name "named"
+  when "smartos"
+    service_name "dns/server:default"
   end
   supports :status => true, :reload => true, :restart => true
   action [ :enable ]
+end
+
+if node[:platform] == "smartos"
+  template "#{node[:bind9][:config_path]}/named.conf" do
+    source "named.conf.erb"
+    owner "root"
+    group "root"
+    mode 0644
+    notifies :restart, resources(:service => "bind9")
+  end
 end
 
 template node[:bind9][:options_file] do
