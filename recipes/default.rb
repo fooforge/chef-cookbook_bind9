@@ -25,10 +25,12 @@ package "bind9" do
   action :install
 end
 
-directory "/var/log/bind/" do
+directory node[:bind9][:log_path] do
   owner node[:bind9][:user]
   group node[:bind9][:user]
-  mode 0755
+  mode 0775
+  recursive true
+  action :create
 end
 
 service "bind9" do
