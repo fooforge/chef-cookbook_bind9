@@ -17,7 +17,8 @@ Platform:
 
 * Debian
 * Ubuntu
-* Centos
+* CentOS
+* SmartOS
 
 Attributes
 ==========
