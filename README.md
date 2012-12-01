@@ -28,7 +28,7 @@ Attributes
 * **node[:bind9][:allow_update]**      - Allow dynamic DNS updates. Default is: none
 * **node[:bind9][:allow_transfer]**    - Allow zone transfers globally. Default is: none
 * **node[:bind9][:enable_forwarding]** - Enables forwarding of requests. Default is: No forwarding
-* **node[:bind9][:forwarders]**        - Array for forwarding DNS. Default is: 4.4.4.4 and 8.8.8.8 (Google DNS)
+* **node[:bind9][:forwarders]**        - Array for forwarding DNS. Default is: 8.8.8.8 and 8.8.4.4 (Google DNS)
 
 Usage
 =====
@@ -54,8 +54,8 @@ Examples
       "id": "exampleDOTcom",
       "domain": "example.com",
       "type": "master",
-      "allow_transfer": [ "4.4.4.4",
-                          "8.8.8.8" ],
+      "allow_transfer": [ "8.8.8.8",
+                          "8.8.4.4" ],
       "zone_info": {
         "global_ttl": 300,
         "soa": "ns.example.com.",

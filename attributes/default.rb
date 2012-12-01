@@ -9,7 +9,7 @@ default[:bind9][:allow_transfer] = "none"
 default[:bind9][:allow_update] = nil
 
 default[:bind9][:enable_forwarding] = false
-default[:bind9][:forwarders] = [ "4.4.4.4", "8.8.8.8" ]
+default[:bind9][:forwarders] = [ "8.8.8.8", "8.8.4.4" ]
 
 case platform
 when "centos","redhat","fedora","scientific","amazon"
