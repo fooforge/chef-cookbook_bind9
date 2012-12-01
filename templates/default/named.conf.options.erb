@@ -33,6 +33,12 @@ options {
     };
 
   <% end %>
+    //========================================================================
+    // If BIND logs error messages about the root key being expired,
+    // you will need to update your keys.  See https://www.isc.org/bind-keys
+    //========================================================================
+    dnssec-validation auto;
+
     auth-nxdomain no;    # conform to RFC1035
   <% if node[:bind9][:enable_ipv6] %>
     listen-on-v6 { any; };
