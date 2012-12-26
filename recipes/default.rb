@@ -62,13 +62,16 @@ end
 
 search(:zones).each do |zone|
   unless zone['autodomain'].nil? || zone['autodomain'] == ''
+    name_attrs = !zone['name_attrs'].nil? && zone['name_attrs'] != '' ? zone['name_attrs'] : ['hostname']
     search(:node, "domain:#{zone['autodomain']}").each do |host|
       next if host['ipaddress'] == '' || host['ipaddress'].nil?
-      zone['zone_info']['records'].push( {
-        "name" => host['hostname'],
-        "type" => "A",
-        "ip" => host['ipaddress']
-      })
+      name_attrs.each do |name_attr|
+        zone['zone_info']['records'].push( {
+          "name" => name_attr == 'name' ? host.name : host[name_attr],
+          "type" => "A",
+          "ip" => host['ipaddress']
+        })
+      end
     end
   end
 
