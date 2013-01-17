@@ -3,7 +3,7 @@ Description
 
 This cookbook takes care of the installation and configuration of BIND9. At the moment you're able to define some global variables and to manage your zonefiles via data bags (json example below).
 It currently also supports automatic serial number generation and automatic resource records for chef nodes (see optional json in example below)
-Besides that there's not much to see, e.g. no DNSSEC, no configurable logging, no rndc shell operations or other safety checks (named-checkconf, etc.).
+Besides that there's not much to see, e.g. no configurable logging, no rndc shell operations or other safety checks (named-checkconf, etc.).
 
 It's my intention to round its edges over time. If you want to help feel free to contribute!
 
@@ -15,9 +15,7 @@ Requirements
 
 Platform:
 
-* Debian
-* Ubuntu
-* Centos
+* Ubuntu (Tested on)
 
 Attributes
 ==========
@@ -29,6 +27,10 @@ Attributes
 * **node[:bind9][:allow_transfer]**    - Allow zone transfers globally. Default is: none
 * **node[:bind9][:enable_forwarding]** - Enables forwarding of requests. Default is: No forwarding
 * **node[:bind9][:forwarders]**        - Array for forwarding DNS. Default is: 4.4.4.4 and 8.8.8.8 (Google DNS)
+
+* **node[:bind9][:enable_ddns]**       - Allows Dynamic DNS (DDNS) to be enabled.  Default is: false
+* **node[:bind9][:ddns_algorithm]**    - If DDNS is enabled, a algorithm can be specified. Default is: nil
+* **node[:bind9][:ddns_secret]**       - If DDNS is enabled, a key can be specified. Default is: nil
 
 Usage
 =====

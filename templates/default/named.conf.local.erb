@@ -1,20 +1,26 @@
 //
-// Do any local configuration here
+// MANAGED BY CHEF : Do any local configuration here
 //
 
 // Consider adding the 1918 zones here, if they are not used in your
 // organization
 //include "/etc/bind/zones.rfc1918";
 
+<% if node[:bind9][:enable_ddns] %>
+key DDNS_UPDATE {
+    algorithm <%= node[:bind9][:ddns_algorithm] %>;
+    secret "<%= node[:bind9][:ddns_secret] %>";
+};
+<% end %>
+
 <% @zonefiles.each do |conf| -%>
 zone "<%= conf["domain"] %>" IN {
   type <%= conf["type"] %>;
-  file "<%= node[:bind9][:config_path] %>/<%= conf["domain"] %>";
-  allow-transfer {
-  <% conf["allow_transfer"].each do |ip| -%>
-    <%= ip %>;
+  file "<%= node[:bind9][:data_path] %>/<%= conf["domain"] %>";
+  notify no;
+  <% if node[:bind9][:enable_ddns] %>
+  allow-update { key DDNS_UPDATE; };
   <% end %>
-  };
 };
 
 <% end %>
