@@ -22,6 +22,7 @@ zone "<%= conf["domain"] %>" IN {
   <% conf["allow_transfer"].each do |ip| -%>
     <%= ip %>;
   <% end %>
+  };
   <% if node[:bind9][:enable_ddns] %>
   allow-update { key DDNS_UPDATE; };
   <% end %>
