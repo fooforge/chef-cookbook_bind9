@@ -20,6 +20,7 @@ $TTL <%= @global_ttl %>
 ns                         IN     A <%= node['ipaddress'] %>
 
 <% @records.each do |record| -%>
-<%= "%-20s %5s IN %5s %s" % [record['name'],record['ttl'],record['type'],record['ip']] %>
+<% ip = record['ip'] == ":ipaddress" ? @ipaddress : record['ip'] %>
+<%= "%-20s %5s IN %5s %s" % [record['name'],record['ttl'],record['type'],ip] %>
 <% end %>
 

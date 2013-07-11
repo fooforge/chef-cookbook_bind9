@@ -35,7 +35,7 @@ end
 
 service "bind9" do
   case node[:platform]
-  when "centos", "redhat"
+  when "centos", "redhat", "fedora", "scientific", "amazon"
     service_name "named"
   when "smartos"
     service_name "dns/server:default"
@@ -44,14 +44,13 @@ service "bind9" do
   action [ :enable ]
 end
 
-if node[:platform] == "smartos"
-  template "#{node[:bind9][:config_path]}/named.conf" do
-    source "named.conf.erb"
-    owner "root"
-    group "root"
-    mode 0644
-    notifies :restart, resources(:service => "bind9")
-  end
+template node[:bind9][:config_file] do
+  only_if { %w{centos redhat fedora scientific amazon smartos}.member? node[:platform] }
+  source "named.conf.erb"
+  owner "root"
+  group "root"
+  mode 0644
+  notifies :restart, resources(:service => "bind9")
 end
 
 template node[:bind9][:options_file] do
@@ -73,12 +72,11 @@ template node[:bind9][:local_file] do
   notifies :restart, resources(:service => "bind9")
 end
 
-
 search(:zones).each do |zone|
   unless zone['autodomain'].nil? || zone['autodomain'] == ''
     search(:node, "domain:#{zone['autodomain']}").each do |host|
       next if host['ipaddress'] == '' || host['ipaddress'].nil?
-      zone['zone_info']['records'].push( {
+      zone['zone_info']['records'].push({
         "name" => host['hostname'],
         "type" => "A",
         "ip" => host['ipaddress']
@@ -86,8 +84,8 @@ search(:zones).each do |zone|
     end
   end
 
-  template "#{node[:bind9][:config_path]}/#{zone['domain']}" do
-    source "#{node[:bind9][:config_path]}/#{zone['domain']}.erb"
+  template "#{node[:bind9][:data_path]}/#{zone['domain']}" do
+    source "#{node[:bind9][:data_path]}/#{zone['domain']}.erb"
     local true
     owner "root"
     group "root"
@@ -99,7 +97,7 @@ search(:zones).each do |zone|
     action :nothing
   end
 
-  template "#{node[:bind9][:config_path]}/#{zone['domain']}.erb" do
+  template "#{node[:bind9][:data_path]}/#{zone['domain']}.erb" do
     source "zonefile.erb"
     owner "root"
     group "root"
@@ -113,10 +111,15 @@ search(:zones).each do |zone|
       :mail_exchange => zone['zone_info']['mail_exchange'],
       :records => zone['zone_info']['records']
     })
-    notifies :create, resources(:template => "#{node[:bind9][:config_path]}/#{zone['domain']}"), :immediately
+    notifies :create, resources(:template => "#{node[:bind9][:data_path]}/#{zone['domain']}"), :immediately
   end
 end
 
 service "bind9" do
   action [ :start ]
+end
+
+bash "selinux" do
+  only_if { %w{centos redhat fedora scientific amazon}.member? node[:platform] }
+  code "(sudo setsebool named_write_master_zones true) || true"
 end
