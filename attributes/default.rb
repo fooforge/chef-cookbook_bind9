@@ -12,6 +12,11 @@ default[:bind9][:allow_update] = nil
 default[:bind9][:enable_forwarding] = true
 default[:bind9][:forwarders] = ["8.8.8.8", "8.8.4.4"]
 
+# Allow user to enable DDNS
+default[:bind9][:enable_ddns] = false
+default[:bind9][:ddns_algorithm] = nil
+default[:bind9][:ddns_secret] = nil
+
 case platform
 when "centos","redhat","fedora","scientific","amazon"
   default[:bind9][:config_path] = "/etc/named"

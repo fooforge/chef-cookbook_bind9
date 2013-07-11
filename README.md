@@ -3,11 +3,11 @@ Description
 
 This cookbook takes care of the installation and configuration of BIND9. At the moment you're able to define some global variables and to manage your zonefiles via data bags (json example below).
 It currently also supports automatic serial number generation and automatic resource records for chef nodes (see optional json in example below)
-Besides that there's not much to see, e.g. no DNSSEC, no configurable logging, no rndc shell operations or other safety checks (named-checkconf, etc.).
+Besides that there's not much to see, e.g. no configurable logging, no rndc shell operations or other safety checks (named-checkconf, etc.).
 
 It's my intention to round its edges over time. If you want to help feel free to contribute!
 
-**DISCLAIMER**:  
+**DISCLAIMER**:
 Please keep in mind that this cookbook is far from finished and not adequately tested. It could break your setup. Use at **YOUR OWN RISK**!
 
 Requirements
@@ -31,11 +31,15 @@ Attributes
 * **node[:bind9][:enable_forwarding]** - Enables forwarding of requests. Default is: No forwarding
 * **node[:bind9][:forwarders]**        - Array for forwarding DNS. Default is: 8.8.8.8 and 8.8.4.4 (Google DNS)
 
+* **node[:bind9][:enable_ddns]**       - Allows Dynamic DNS (DDNS) to be enabled.  Default is: false
+* **node[:bind9][:ddns_algorithm]**    - If DDNS is enabled, a algorithm can be specified. Default is: nil
+* **node[:bind9][:ddns_secret]**       - If DDNS is enabled, a key can be specified. Default is: nil
+
 Usage
 =====
 
 Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for serving domains you may add the appropriate data via data bags (example below).
-Please note that the data bag's structure is mandatory except: 
+Please note that the data bag's structure is mandatory except:
 
 * TTL for DNS records (if you decide to leave it empty, the global TTL will take over)
 * autodomain for the zone (if you include this, automatic records will be added for chef nodes whose "domain" matches this)
