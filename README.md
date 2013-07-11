@@ -17,18 +17,19 @@ Platform:
 
 * Debian
 * Ubuntu
-* Centos
+* CentOS
+* SmartOS
 
 Attributes
 ==========
 
 * **node[:bind9][:enable_ipv6]**       - Enables BIND to listen on an IPv6 address. Default is: On
-* **node[:bind9][:allow_query]**       - Allow clients to query the nameserver. Default is: anyone
-* **node[:bind9][:allow_recursion]**   - Allow recursive name resolution. Default is: none (to prevent DNS cache poisoning)
-* **node[:bind9][:allow_update]**      - Allow dynamic DNS updates. Default is: none
-* **node[:bind9][:allow_transfer]**    - Allow zone transfers globally. Default is: none
+* **node[:bind9][:allow_query]**       - Array of clients allowed to query the nameserver. Default is: anyone
+* **node[:bind9][:allow_recursion]**   - Array of clients allowed to make recursive name resolution queries. Default is: none (to prevent DNS cache poisoning)
+* **node[:bind9][:allow_update]**      - Array of clients allowed to make dynamic DNS updates. Default is: none
+* **node[:bind9][:allow_transfer]**    - Array of clients allowed to make zone transfers. Default is: none
 * **node[:bind9][:enable_forwarding]** - Enables forwarding of requests. Default is: No forwarding
-* **node[:bind9][:forwarders]**        - Array for forwarding DNS. Default is: 4.4.4.4 and 8.8.8.8 (Google DNS)
+* **node[:bind9][:forwarders]**        - Array for forwarding DNS. Default is: 8.8.8.8 and 8.8.4.4 (Google DNS)
 
 Usage
 =====
@@ -40,7 +41,18 @@ Please note that the data bag's structure is mandatory except:
 * autodomain for the zone (if you include this, automatic records will be added for chef nodes whose "domain" matches this)
 
 
-Examples
+Example attributes for a caching-only setup
+=====
+
+    default[:bind9][:allow_query] = ["localnets", "localhost"]
+    default[:bind9][:allow_recursion] = ["localnets", "localhost"]
+    default[:bind9][:allow_transfer] = ["none"]
+    default[:bind9][:allow_update] = nil
+    default[:bind9][:enable_forwarding] = true
+    default[:bind9][:forwarders] = ["8.8.8.8", "8.8.4.4"]
+
+
+Example zone setup
 =====
 
     $ knife data bag create zones
