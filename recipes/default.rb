@@ -25,6 +25,18 @@ package "bind9" do
   action :install
 end
 
+directory node[:bind9][:data_path] do
+  only_if {
+    node[:bind9][:enable_ddns] and
+    %w{centos redhat fedora scientific amazon}.member? node[:platform]
+  }
+  owner node[:bind9][:user]
+  group node[:bind9][:user]
+  mode 0774
+  recursive false
+  action :create
+end
+
 directory node[:bind9][:log_path] do
   owner node[:bind9][:user]
   group node[:bind9][:user]
