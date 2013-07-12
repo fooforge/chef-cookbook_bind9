@@ -3,11 +3,11 @@ Description
 
 This cookbook takes care of the installation and configuration of BIND9. At the moment you're able to define some global variables and to manage your zonefiles via data bags (json example below).
 It currently also supports automatic serial number generation and automatic resource records for chef nodes (see optional json in example below)
-Besides that there's not much to see, e.g. no DNSSEC, no configurable logging, no rndc shell operations or other safety checks (named-checkconf, etc.).
+Besides that there's not much to see, e.g. no configurable logging, no rndc shell operations or other safety checks (named-checkconf, etc.).
 
 It's my intention to round its edges over time. If you want to help feel free to contribute!
 
-**DISCLAIMER**:  
+**DISCLAIMER**:
 Please keep in mind that this cookbook is far from finished and not adequately tested. It could break your setup. Use at **YOUR OWN RISK**!
 
 Requirements
@@ -17,30 +17,46 @@ Platform:
 
 * Debian
 * Ubuntu
-* Centos
+* CentOS
+* SmartOS
 
 Attributes
 ==========
 
 * **node[:bind9][:enable_ipv6]**       - Enables BIND to listen on an IPv6 address. Default is: On
-* **node[:bind9][:allow_query]**       - Allow clients to query the nameserver. Default is: anyone
-* **node[:bind9][:allow_recursion]**   - Allow recursive name resolution. Default is: none (to prevent DNS cache poisoning)
-* **node[:bind9][:allow_update]**      - Allow dynamic DNS updates. Default is: none
-* **node[:bind9][:allow_transfer]**    - Allow zone transfers globally. Default is: none
+* **node[:bind9][:allow_query]**       - Array of clients allowed to query the nameserver. Default is: anyone
+* **node[:bind9][:allow_recursion]**   - Array of clients allowed to make recursive name resolution queries. Default is: none (to prevent DNS cache poisoning)
+* **node[:bind9][:allow_update]**      - Array of clients allowed to make dynamic DNS updates. Default is: none
+* **node[:bind9][:allow_transfer]**    - Array of clients allowed to make zone transfers. Default is: none
 * **node[:bind9][:enable_forwarding]** - Enables forwarding of requests. Default is: No forwarding
-* **node[:bind9][:forwarders]**        - Array for forwarding DNS. Default is: 4.4.4.4 and 8.8.8.8 (Google DNS)
+* **node[:bind9][:forwarders]**        - Array for forwarding DNS. Default is: 8.8.8.8 and 8.8.4.4 (Google DNS)
+
+* **node[:bind9][:enable_ddns]**       - Allows Dynamic DNS (DDNS) to be enabled.  Default is: false
+* **node[:bind9][:ddns_algorithm]**    - If DDNS is enabled, a algorithm can be specified. Default is: nil
+* **node[:bind9][:ddns_secret]**       - If DDNS is enabled, a key can be specified. Default is: nil
 
 Usage
 =====
 
 Add "recipe[bind9]" directly to a node or a role. If you want to use BIND9 for serving domains you may add the appropriate data via data bags (example below).
-Please note that the data bag's structure is mandatory except: 
+Please note that the data bag's structure is mandatory except:
 
 * TTL for DNS records (if you decide to leave it empty, the global TTL will take over)
 * autodomain for the zone (if you include this, automatic records will be added for chef nodes whose "domain" matches this)
 
 
-Examples
+Example attributes for a caching-only setup
+=====
+
+    default[:bind9][:allow_query] = ["localnets", "localhost"]
+    default[:bind9][:allow_recursion] = ["localnets", "localhost"]
+    default[:bind9][:allow_transfer] = ["none"]
+    default[:bind9][:allow_update] = nil
+    default[:bind9][:enable_forwarding] = true
+    default[:bind9][:forwarders] = ["8.8.8.8", "8.8.4.4"]
+
+
+Example zone setup
 =====
 
     $ knife data bag create zones
