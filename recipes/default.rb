@@ -25,7 +25,7 @@ package "bind9" do
   action :install
 end
 
-directory "/var/log/bind/" do
+directory "/var/log/named/" do
   owner node[:bind9][:user]
   group node[:bind9][:user]
   mode 0755
