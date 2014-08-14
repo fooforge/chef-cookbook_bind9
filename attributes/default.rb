@@ -26,3 +26,4 @@ else
 	default[:bind9][:data_path] = "/var/cache/bind"
   default[:bind9][:user] = "bind"
 end
+default[:bind9][:serial_number] = 0

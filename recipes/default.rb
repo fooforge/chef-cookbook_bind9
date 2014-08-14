@@ -72,6 +72,19 @@ search(:zones).each do |zone|
     end
   end
 
+  # This cookbook documents yyyyMMddNN but attempts yyyyMMddhhmmss which is too long for BIND.  Instead, let's wrap a 2 digit serial number in to the last 2 NN digits.
+  ruby_block "increment_serial_number" do
+    block do
+      current = node[:bind9][:serial_number].to_i + 1
+      if current > 99
+        current = 0
+      end
+      node.set[:bind9][:serial_number] = current
+    end
+    action :nothing
+  end
+
+
   template "#{node[:bind9][:config_path]}/#{zone['domain']}" do
     source "#{node[:bind9][:config_path]}/#{zone['domain']}.erb"
     local true
@@ -80,7 +93,7 @@ search(:zones).each do |zone|
     mode 0644
     notifies :restart, resources(:service => "bind9")
     variables({
-      :serial => Time.new.strftime("%Y%m%d%H%M%S")
+      :serial => Time.new.strftime("%Y%m%d") +  node[:bind9][:serial_number].to_s.rjust(2, "0")
     })
     action :nothing
   end
@@ -99,6 +112,7 @@ search(:zones).each do |zone|
       :mail_exchange => zone['zone_info']['mail_exchange'],
       :records => zone['zone_info']['records']
     })
+    notifies :run, resources(:ruby_block => "increment_serial_number"), :immediately
     notifies :create, resources(:template => "#{node[:bind9][:config_path]}/#{zone['domain']}"), :immediately
   end
 end
