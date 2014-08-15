@@ -32,8 +32,11 @@ puts "; Record Time To Live: #{zf.soa[:ttl]}"
 # Show A-Records
 puts "; A Records:"
 zf.a.each do |a_record|
-  
-   puts  "{ \"type\": \"A\" , \"name\": \"#{a_record[:name]}\", \"ip\": \"#{a_record[:host]}\"},"
+   ttl_text = ''
+   if !a_record[:ttl].nil? and a_record[:ttl] != '' and a_record[:ttl] != zf.ttl
+     ttl_text = "\"ttl\": \"#{a_record[:ttl]}\", "
+   end
+   puts  "{ \"type\": \"A\", #{ttl_text}\"name\": \"#{a_record[:name]}\", \"ip\": \"#{a_record[:host]}\"},"
 end
 
 puts "; CNAME Records:"
