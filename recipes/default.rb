@@ -62,7 +62,7 @@ end
 
 search(:zones).each do |zone|
   unless zone['autodomain'].nil? || zone['autodomain'] == ''
-    search(:node, "domain:#{zone['autodomain']}").each do |host|
+    search(:node, "fqdn:#{zone['autodomain']}").each do |host|
       next if host['ipaddress'] == '' || host['ipaddress'].nil?
       zone['zone_info']['records'].push( {
         "name" => host['hostname'],
