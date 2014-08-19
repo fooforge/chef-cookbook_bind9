@@ -1,5 +1,5 @@
 $TTL <%= @global_ttl %>
-@ IN SOA <%= @soa %> <%= @contact %> (
+<%= @soa_apex %> IN SOA <%= @soa %> <%= @contact %> (
                 <%%= @serial %> ; serial [yyyyMMddNN]
                 4H      ; refresh
                 30M     ; retry

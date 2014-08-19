@@ -107,6 +107,7 @@ search(:zones).each do |zone|
     variables({
       :domain => zone['domain'],
       :soa => zone['zone_info']['soa'],
+      :soa_apex => zone['zone_info'].has_key?('soa_apex') ? zone['zone_info']['soa_apex'] : '@',
       :contact => zone['zone_info']['contact'],
       :global_ttl => zone['zone_info']['global_ttl'],
       :nameserver => zone['zone_info']['nameserver'],
