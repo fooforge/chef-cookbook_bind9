@@ -25,7 +25,7 @@ package "bind9" do
   action :install
 end
 
-directory "/var/log/bind/" do
+directory "/var/log/named/" do
   owner node[:bind9][:user]
   group node[:bind9][:user]
   mode 0755
@@ -62,7 +62,8 @@ end
 
 search(:zones).each do |zone|
   unless zone['autodomain'].nil? || zone['autodomain'] == ''
-    search(:node, "domain:#{zone['autodomain']}").each do |host|
+    log "fqdn:*.#{zone['autodomain']}"
+    search(:node, "fqdn:*.#{zone['autodomain']}").each do |host|
       next if host['ipaddress'] == '' || host['ipaddress'].nil?
       zone['zone_info']['records'].push( {
         "name" => host['hostname'],
@@ -72,6 +73,19 @@ search(:zones).each do |zone|
     end
   end
 
+  # This cookbook documents yyyyMMddNN but attempts yyyyMMddhhmmss which is too long for BIND.  Instead, let's wrap a 2 digit serial number in to the last 2 NN digits.
+  ruby_block "increment_serial_number" do
+    block do
+      current = node[:bind9][:serial_number].to_i + 1
+      if current > 99
+        current = 0
+      end
+      node.set[:bind9][:serial_number] = current
+    end
+    action :nothing
+  end
+
+
   template "#{node[:bind9][:config_path]}/#{zone['domain']}" do
     source "#{node[:bind9][:config_path]}/#{zone['domain']}.erb"
     local true
@@ -80,7 +94,7 @@ search(:zones).each do |zone|
     mode 0644
     notifies :restart, resources(:service => "bind9")
     variables({
-      :serial => Time.new.strftime("%Y%m%d%H%M%S")
+      :serial => Time.new.strftime("%Y%m%d") +  node[:bind9][:serial_number].to_s.rjust(2, "0")
     })
     action :nothing
   end
@@ -93,12 +107,14 @@ search(:zones).each do |zone|
     variables({
       :domain => zone['domain'],
       :soa => zone['zone_info']['soa'],
+      :soa_apex => zone['zone_info'].has_key?('soa_apex') ? zone['zone_info']['soa_apex'] : '@',
       :contact => zone['zone_info']['contact'],
       :global_ttl => zone['zone_info']['global_ttl'],
       :nameserver => zone['zone_info']['nameserver'],
       :mail_exchange => zone['zone_info']['mail_exchange'],
       :records => zone['zone_info']['records']
     })
+    notifies :run, resources(:ruby_block => "increment_serial_number"), :immediately
     notifies :create, resources(:template => "#{node[:bind9][:config_path]}/#{zone['domain']}"), :immediately
   end
 end
