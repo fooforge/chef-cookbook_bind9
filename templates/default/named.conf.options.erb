@@ -37,6 +37,8 @@ options {
   <% if node[:bind9][:enable_ipv6] %>
     listen-on-v6 { any; };
   <% end %>
+  
+  transfer-format many-answers;
 };
 
 logging {
@@ -49,4 +51,5 @@ logging {
       
   category default { default_log; };
   category general { default_log; };
+  category lame-servers { null; };
 };
